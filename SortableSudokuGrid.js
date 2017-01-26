@@ -15,6 +15,7 @@ import {
     PanResponder,
     Dimensions,
     Animated,
+    Text
 } from 'react-native'
 
 import SortableCell from './SortableCell'
@@ -68,6 +69,7 @@ class SortableSudokuGrid extends Component {
             dataSource,
             sortable,
             containerHeight: new Animated.Value(containerHeight),
+            isActive: this.props.isActive
         }
 
         this._pageLeft = 0
@@ -119,8 +121,8 @@ class SortableSudokuGrid extends Component {
         //}
         //let {columnCount, dataSource, containerStyle, } = this.props
         //let containerHeight = (Math.floor(dataSource.length - 1 / columnCount) + 1) * this._rowHeight
-        return (
-            <Animated.View
+        if(this.state.isActive){
+            return (<Animated.View
                 style={[ this.props.containerStyle, {width: this._rowWidth, height: this.state.containerHeight, flexDirection: 'column', alignItems: 'stretch', justifyContent: 'flex-start', }]}>
                 <View
                     style={[styles.container, ]}
@@ -129,8 +131,10 @@ class SortableSudokuGrid extends Component {
                     onLayout={this._onLayout}>
                     {this._renderSortableCells()}
                 </View>
-            </Animated.View>
-        )
+            </Animated.View>)
+        }
+        return <View></View>
+        
     }
 
     componentWillReceiveProps (nextProps) {
@@ -138,6 +142,11 @@ class SortableSudokuGrid extends Component {
         if (sortable !== this.props.sortable) {
             this.setState({
                 sortable,
+            })
+        }
+        if(nextProps.isActive === true){
+            this.setState({
+                isActive: nextProps.isActive
             })
         }
     }
@@ -206,9 +215,9 @@ class SortableSudokuGrid extends Component {
         //console.log(`_onTouchStart... this._touchDown = ${this._touchDown}`)
         //compare this._touchDown to fix unexcepted _onTouchStart trigger in specified cases
         if (this._touchDown || !this.state.sortable ) {
-            if(this.props.scrollParent){
-            this.props.scrollParent.setNativeProps({scrollEnabled: true})
-        }
+            if(this.props.scrollParent && this.props.swipeParent){
+                this.props.scrollParent.setNativeProps({scrollEnabled: true})
+            }
             return
         }
         
@@ -219,8 +228,8 @@ class SortableSudokuGrid extends Component {
             //console.log(`_onTouchStart do main logic...`)
             let { delay, } = touchStart
            if(this.props.scrollParent){
-            this.props.scrollParent.setNativeProps({scrollEnabled: false})
-        }
+                this.props.scrollParent.setNativeProps({scrollEnabled: false})
+            }
             this._responderTimer = this.setTimeout(() => {
                  
                 ////console.log(`pageX = ${pageX}, pageY = ${pageY}, this._pageLeft = ${this._pageLeft}, this._pageTop = ${this._pageTop},`)
@@ -251,10 +260,9 @@ class SortableSudokuGrid extends Component {
     }
 
     _onTouchMove = (e, gestureState) => {
-        //console.log(`_onTouchMove this._touchDown = ${this._touchDown}`)
         //compare this._touchDown to fix unexcepted _onTouchMove trigger in specified cases
-        if (!this._touchDown || !this.state.sortable || !this._currentStartCell || !this._currentDraggingComponent) {
-            if(this.props.scrollParent){
+        if (!this._touchDown || !this._currentStartCell || !this._currentDraggingComponent) {
+            if(this.props.scrollParent && this.props.swipeParent){
                     this.props.scrollParent.setNativeProps({scrollEnabled: true})
                 }
             return
@@ -301,20 +309,18 @@ class SortableSudokuGrid extends Component {
 
     _onTouchEnd = (e, gestureState) => {
         this._touchDown = false
-
         this.clearTimeout(this._responderTimer)
         this._responderTimer = null
-
         //compare this._touchEnding to fix unexcepted _onTouchEnd trigger in specified cases
         if (this._touchEnding || !this.state.sortable || !this._currentStartCell || !this._currentDraggingComponent) {
-            if(this.props.scrollParent){
+            if(this.props.scrollParent && this.props.swipeParent){
                 this.props.scrollParent.setNativeProps({scrollEnabled: true})
             }
             return
         }
 
         this._touchEnding = true
-        if(this.props.scrollParent){
+        if(this.props.scrollParent  && this.props.swipeParent ){
                 this.props.scrollParent.setNativeProps({scrollEnabled: true})
             }
         //console.log(`_onTouchEnd do main logic...`)
