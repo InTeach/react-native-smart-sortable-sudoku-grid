@@ -206,15 +206,23 @@ class SortableSudokuGrid extends Component {
         //console.log(`_onTouchStart... this._touchDown = ${this._touchDown}`)
         //compare this._touchDown to fix unexcepted _onTouchStart trigger in specified cases
         if (this._touchDown || !this.state.sortable ) {
+            if(this.props.scrollParent){
+            this.props.scrollParent.setNativeProps({scrollEnabled: true})
+        }
             return
         }
+        
         //console.log(`_onTouchStart not return...`)
         let { pageX, pageY, } = e.nativeEvent
         if (!this._responderTimer && !this._currentStartCell && !this._currentDraggingComponent && !this._isRemoving && !this._isAdding) {
             this._touchDown = true
             //console.log(`_onTouchStart do main logic...`)
             let { delay, } = touchStart
+           if(this.props.scrollParent){
+            this.props.scrollParent.setNativeProps({scrollEnabled: false})
+        }
             this._responderTimer = this.setTimeout(() => {
+                 
                 ////console.log(`pageX = ${pageX}, pageY = ${pageY}, this._pageLeft = ${this._pageLeft}, this._pageTop = ${this._pageTop},`)
                 let draggingCell = this._getTouchCell({
                     x: pageX - this._pageLeft,
@@ -225,6 +233,7 @@ class SortableSudokuGrid extends Component {
                 }
                 this._currentStartCell = draggingCell
                 this._currentDraggingComponent = this._currentStartCell.component
+                
                 //console.log(`this._cells => `)
                 //console.log(this._cells)
                 //console.log(`_onTouchStart this._currentStartCell.component.props.index = ${this._currentStartCell.component.props.index}`)
@@ -245,8 +254,14 @@ class SortableSudokuGrid extends Component {
         //console.log(`_onTouchMove this._touchDown = ${this._touchDown}`)
         //compare this._touchDown to fix unexcepted _onTouchMove trigger in specified cases
         if (!this._touchDown || !this.state.sortable || !this._currentStartCell || !this._currentDraggingComponent) {
+            if(this.props.scrollParent){
+                    this.props.scrollParent.setNativeProps({scrollEnabled: true})
+                }
             return
         }
+        if(this.props.scrollParent){
+                    this.props.scrollParent.setNativeProps({scrollEnabled: false})
+                }
         let { pageX, pageY, } = e.nativeEvent
 
         //console.log(`_onTouchMove do main logic...`)
@@ -292,11 +307,16 @@ class SortableSudokuGrid extends Component {
 
         //compare this._touchEnding to fix unexcepted _onTouchEnd trigger in specified cases
         if (this._touchEnding || !this.state.sortable || !this._currentStartCell || !this._currentDraggingComponent) {
+            if(this.props.scrollParent){
+                this.props.scrollParent.setNativeProps({scrollEnabled: true})
+            }
             return
         }
 
         this._touchEnding = true
-
+        if(this.props.scrollParent){
+                this.props.scrollParent.setNativeProps({scrollEnabled: true})
+            }
         //console.log(`_onTouchEnd do main logic...`)
 
         let animationType = cellAnimationTypes.backToOrigin
