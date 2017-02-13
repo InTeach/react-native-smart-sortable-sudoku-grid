@@ -123,9 +123,9 @@ class SortableSudokuGrid extends Component {
         //let containerHeight = (Math.floor(dataSource.length - 1 / columnCount) + 1) * this._rowHeight
         if(this.state.isActive){
             return (<Animated.View
-                style={[{width: this._rowWidth, flexDirection: 'column', alignItems: 'stretch', justifyContent: 'flex-start'}, this.props.containerStyle]}>
+                style={[ this.props.containerStyle, {width: this._rowWidth, height: this.state.containerHeight, flexDirection: 'column', alignItems: 'stretch', justifyContent: 'flex-start', }]}>
                 <View
-                    style={styles.container}
+                    style={[styles.container, ]}
                     ref={ component => this._container = component }
                     {...this._panResponder.panHandlers}
                     onLayout={this._onLayout}>
