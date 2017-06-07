@@ -41,10 +41,12 @@ export default class SortableCell extends Component {
             coordinate: new Animated.ValueXY({
                 x,
                 y,
+                useNativeDriver: true,
             }),
             scale: new Animated.Value(1),
             zIndex: 0,
             visible: true,
+            pan:  new Animated.ValueXY()
         }
         this._scaleAnimationInstace = null
         this._translationAnimationInstace = null
@@ -59,7 +61,11 @@ export default class SortableCell extends Component {
         return (
             this.state.visible ?
                 <Animated.View
-                    style={{width: columnWidth, height: rowHeight, position: 'absolute', zIndex: this.state.zIndex, left: x, top: y, transform: [ { scale: this.state.scale, }, ], }}
+                    style={{width: columnWidth, height: rowHeight, position: 'absolute', zIndex: this.state.zIndex, /*left: x, top: y, */transform: [ 
+                        { scale: this.state.scale, }, 
+                        {translateX: x},
+                        {translateY: y}
+                        ], }}
                     key={`sortable-cell-${(data.key != null) ? data.key : index}`}>
                     {this.props.renderCell(data, this)}
                 </Animated.View> : null
@@ -76,6 +82,7 @@ export default class SortableCell extends Component {
             coordinate: new Animated.ValueXY({
                 x,
                 y,
+                useNativeDriver: true,
             })
         })
     }
@@ -95,6 +102,7 @@ export default class SortableCell extends Component {
             {
                 toValue: scaleValue,
                 duration: cellScale.animationDuration,
+                useNativeDriver: true,
             }
         ).start(() => {
             this._scaleAnimationInstace = null
@@ -143,6 +151,7 @@ export default class SortableCell extends Component {
                     x,
                     y,
                 },
+                useNativeDriver: true,
                 duration: cellTranslation.animationDuration,
             }
         )
