@@ -88,6 +88,8 @@ class SortableSudokuGrid extends Component {
     this._touchEnding = false;
 
     this._cells = [];
+
+    this.scrollEnabled = null;
   }
 
   componentWillMount() {
@@ -237,8 +239,13 @@ class SortableSudokuGrid extends Component {
     //console.log(`_onTouchStart... this._touchDown = ${this._touchDown}`)
     //compare this._touchDown to fix unexcepted _onTouchStart trigger in specified cases
     if (this._touchDown || !this.state.sortable) {
-      if (this.props.scrollParent && this.props.swipeParent) {
+      if (
+        this.props.scrollParent &&
+        this.props.swipeParent &&
+        this.scrollEnabled !== true
+      ) {
         this.props.scrollParent.setNativeProps({ scrollEnabled: true });
+        this.scrollEnabled = true;
       }
       return;
     }
@@ -255,8 +262,9 @@ class SortableSudokuGrid extends Component {
       this._touchDown = true;
       //console.log(`_onTouchStart do main logic...`)
       let { delay } = touchStart;
-      if (this.props.scrollParent) {
+      if (this.props.scrollParent && this.scrollEnabled !== false) {
         this.props.scrollParent.setNativeProps({ scrollEnabled: false });
+        this.scrollEnabled = false;
       }
       this._responderTimer = this.setTimeout(() => {
         ////console.log(`pageX = ${pageX}, pageY = ${pageY}, this._pageLeft = ${this._pageLeft}, this._pageTop = ${this._pageTop},`)
@@ -293,13 +301,20 @@ class SortableSudokuGrid extends Component {
       !this._currentStartCell ||
       !this._currentDraggingComponent
     ) {
-      if (this.props.scrollParent && this.props.swipeParent) {
+      if (
+        this.props.scrollParent &&
+        this.props.swipeParent &&
+        this.scrollEnabled !== true
+      ) {
         this.props.scrollParent.setNativeProps({ scrollEnabled: true });
+        this.scrollEnabled = true;
       }
       return;
     }
-    if (this.props.scrollParent) {
+    if (this.props.scrollParent && this.scrollEnabled !== false) {
       this.props.scrollParent.setNativeProps({ scrollEnabled: false });
+      this.scrollEnabled = false;
+      console.log('this.scrollEnabled', this.scrollEnabled);
     }
     let { pageX, pageY } = e.nativeEvent;
 
